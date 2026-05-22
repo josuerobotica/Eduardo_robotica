@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprende a Usar el Teclado</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f4f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .game-container.error-shake {
+            animation: shake 0.2s ease-in-out 2;
+            background-color: #ffe6e6;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .lives {
+            font-size: 20px;
+            color: #ef4444;
+            letter-spacing: 2px;
+        }
+
+        .word-box {
+            font-size: 48px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            margin: 40px 0;
+            min-height: 60px;
+            word-break: break-all;
+        }
+
+        .char {
+            color: #94a3b8;
+            position: relative;
+        }
+
+        .char.correct {
+            color: #10b981;
+        }
+
+        .char.current {
+            border-bottom: 4px solid #3b82f6;
+        }
+
+        .btn {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn:hover {
+            background-color: #2563eb;
+        }
+
+        .btn:focus {
+            outline: none;
+        }
+
+        .message {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 20px;
+            min-height: 30px;
+        }
+
+        .success-text { color: #10b981; }
+        .danger-text { color: #ef4444; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container" id="gameContainer">
+        <h1>¡Practica tu Mecanografía!</h1>
+        
+        <div class="stats">
+            <div class="lives" id="livesDisplay">❤️❤️❤️❤️❤️</div>
+            <div id="scoreDisplay">Palabras: 0</div>
+        </div>
+
+        <div class="word-box" id="wordBox">Presiona el botón para empezar</div>
+        
+        <button class="btn" id="actionBtn" onclick="startGame()">Generar Palabra</button>
+        
+        <div class="message" id="messageDisplay"></div>
+    </div>
+
+    <script>
+        const wordsList = [
+            "TECLADO", "CASA", "PERRO", "COMPUTADORA", "AMIGO", 
+            "MANZANA", "TECNOLOGIA", "ROBOT", "ESCUELA", "JUEGO",
+            "RATON", "PANTALLA", "CABLE", "CODIGO", "CIENCIA",
+            "MUNDO", "LUNA", "SOL", "LETRAS", "TRABAJO"
+        ];
+
+        let currentWord = "";
+        let currentIndex = 0;
+        let lives = 5;
+        let score = 0;
+        let gameActive = false;
+
+        const wordBox = document.getElementById("wordBox");
+        const livesDisplay = document.getElementById("livesDisplay");
+        const scoreDisplay = document.getElementById("scoreDisplay");
+        const messageDisplay = document.getElementById("messageDisplay");
+        const actionBtn = document.getElementById("actionBtn");
+        const gameContainer = document.getElementById("gameContainer");
+
+        function startGame() {
+            // Escoger palabra al azar
+            currentWord = wordsList[Math.floor(Math.random() * wordsList.length)];
+            currentIndex = 0;
+            lives = 5;
+            gameActive = true;
+
+            // Resetear interfaz
+            messageDisplay.innerHTML = "";
+            actionBtn.innerText = "Cambiar Palabra";
+            updateLives();
+            renderWord();
+        }
+
+        function renderWord() {
+            wordBox.innerHTML = "";
+            currentWord.split("").forEach((char, index) => {
+                const span = document.createElement("span");
+                span.innerText = char;
+                span.classList.add("char");
+                
+                if (index < currentIndex) {
+                    span.classList.add("correct");
+                } else if (index === currentIndex && gameActive) {
+                    span.classList.add("current");
+                }
+                
+                wordBox.appendChild(span);
+            });
+        }
+
+        function updateLives() {
+            livesDisplay.innerText = "❤️".repeat(lives) + "🖤".repeat(5 - lives);
+        }
+
+        document.addEventListener("keydown", (event) => {
+            if (!gameActive) return;
+
+            // Ignorar teclas especiales como Shift, Control, etc.
+            if (event.key.length > 1) return;
+
+            // Convertir a mayúsculas para evitar problemas de capitalización
+            const pressedKey = event.key.toUpperCase();
+            const targetKey = currentWord[currentIndex];
+
+            if (pressedKey === targetKey) {
+                // Acierto
+                currentIndex++;
+                renderWord();
+
+                // ¿Ganó la palabra?
+                if (currentIndex === currentWord.length) {
+                    gameActive = false;
+                    score++;
+                    scoreDisplay.innerText = `Palabras: ${score}`;
+                    messageDisplay.innerHTML = '<span class="success-text">¡Excelente! ¡Palabra completada! 🎉</span>';
+                    actionBtn.innerText = "Siguiente Palabra";
+                }
+            } else {
+                // Error
+                lives--;
+                updateLives();
+                
+                // Efecto visual de parpadeo/sacudida
+                gameContainer.classList.add("error-shake");
+                setTimeout(() => gameContainer.classList.remove("error-shake"), 200);
+
+                // ¿Perdió todas las vidas?
+                if (lives === 0) {
+                    gameActive = false;
+                    messageDisplay.innerHTML = '<span class="danger-text">¡Juego Terminado! 😢 Inténtalo de nuevo.</span>';
+                    actionBtn.innerText = "Reiniciar Juego";
+                    score = 0;
+                    scoreDisplay.innerText = `Palabras: ${score}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
