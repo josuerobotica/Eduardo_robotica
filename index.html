@@ -10,6 +10,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
         }
 
         body {
@@ -20,18 +21,20 @@
             justify-content: center;
             min-height: 100vh;
             color: #333;
-            padding: 20px;
+            padding: 10px;
+            overflow-x: hidden;
         }
 
         .game-container {
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             text-align: center;
             transition: all 0.3s ease;
+            margin-bottom: 20px;
         }
 
         .game-container.error-shake {
@@ -41,15 +44,31 @@
 
         h1 {
             font-size: 24px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: #1e293b;
+        }
+
+        .mode-toggle {
+            background-color: #64748b;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .mode-toggle.tablet-active {
+            background-color: #8b5cf6;
         }
 
         .stats {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-weight: 600;
         }
 
@@ -60,11 +79,11 @@
         }
 
         .word-box {
-            font-size: 48px;
+            font-size: 42px;
             font-weight: bold;
             letter-spacing: 4px;
-            margin: 40px 0;
-            min-height: 60px;
+            margin: 30px 0;
+            min-height: 55px;
             word-break: break-all;
         }
 
@@ -98,19 +117,56 @@
             background-color: #2563eb;
         }
 
-        .btn:focus {
-            outline: none;
-        }
-
         .message {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
-            margin-top: 20px;
-            min-height: 30px;
+            margin-top: 15px;
+            min-height: 25px;
         }
 
         .success-text { color: #10b981; }
         .danger-text { color: #ef4444; }
+
+        /* Estilos del Teclado Virtual */
+        .virtual-keyboard {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+            max-width: 650px;
+            background-color: #e2e8f0;
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .key {
+            background-color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 0;
+            flex: 1;
+            max-width: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #334155;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            touch-action: manipulation;
+            transition: background 0.1s;
+        }
+
+        .key:active {
+            background-color: #cbd5e1;
+            transform: scale(0.95);
+        }
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -120,6 +176,8 @@
     </style>
 </head>
 <body>
+
+    <button class="mode-toggle" id="modeBtn" onclick="toggleMode()">Modo: PC 💻</button>
 
     <div class="game-container" id="gameContainer">
         <h1>¡Practica tu Mecanografía!</h1>
@@ -136,6 +194,42 @@
         <div class="message" id="messageDisplay"></div>
     </div>
 
+    <div class="virtual-keyboard" id="virtualKeyboard">
+        <div class="keyboard-row">
+            <button class="key" onclick="handleInput('Q')">Q</button>
+            <button class="key" onclick="handleInput('W')">W</button>
+            <button class="key" onclick="handleInput('E')">E</button>
+            <button class="key" onclick="handleInput('R')">R</button>
+            <button class="key" onclick="handleInput('T')">T</button>
+            <button class="key" onclick="handleInput('Y')">Y</button>
+            <button class="key" onclick="handleInput('U')">U</button>
+            <button class="key" onclick="handleInput('I')">I</button>
+            <button class="key" onclick="handleInput('O')">O</button>
+            <button class="key" onclick="handleInput('P')">P</button>
+        </div>
+        <div class="keyboard-row">
+            <button class="key" onclick="handleInput('A')">A</button>
+            <button class="key" onclick="handleInput('S')">S</button>
+            <button class="key" onclick="handleInput('D')">D</button>
+            <button class="key" onclick="handleInput('F')">F</button>
+            <button class="key" onclick="handleInput('G')">G</button>
+            <button class="key" onclick="handleInput('H')">H</button>
+            <button class="key" onclick="handleInput('J')">J</button>
+            <button class="key" onclick="handleInput('K')">K</button>
+            <button class="key" onclick="handleInput('L')">L</button>
+            <button class="key" onclick="handleInput('Ñ')">Ñ</button>
+        </div>
+        <div class="keyboard-row">
+            <button class="key" onclick="handleInput('Z')">Z</button>
+            <button class="key" onclick="handleInput('X')">X</button>
+            <button class="key" onclick="handleInput('C')">C</button>
+            <button class="key" onclick="handleInput('V')">V</button>
+            <button class="key" onclick="handleInput('B')">B</button>
+            <button class="key" onclick="handleInput('N')">N</button>
+            <button class="key" onclick="handleInput('M')">M</button>
+        </div>
+    </div>
+
     <script>
         const wordsList = [
             "TECLADO", "CASA", "PERRO", "COMPUTADORA", "AMIGO", 
@@ -149,6 +243,7 @@
         let lives = 5;
         let score = 0;
         let gameActive = false;
+        let isTabletMode = false;
 
         const wordBox = document.getElementById("wordBox");
         const livesDisplay = document.getElementById("livesDisplay");
@@ -156,6 +251,21 @@
         const messageDisplay = document.getElementById("messageDisplay");
         const actionBtn = document.getElementById("actionBtn");
         const gameContainer = document.getElementById("gameContainer");
+        const virtualKeyboard = document.getElementById("virtualKeyboard");
+        const modeBtn = document.getElementById("modeBtn");
+
+        function toggleMode() {
+            isTabletMode = !isTabletMode;
+            if (isTabletMode) {
+                modeBtn.innerText = "Modo: Tablet 📱";
+                modeBtn.classList.add("tablet-active");
+                virtualKeyboard.style.display = "flex";
+            } else {
+                modeBtn.innerText = "Modo: PC 💻";
+                modeBtn.classList.remove("tablet-active");
+                virtualKeyboard.style.display = "none";
+            }
+        }
 
         function startGame() {
             currentWord = wordsList[Math.floor(Math.random() * wordsList.length)];
@@ -190,11 +300,10 @@
             livesDisplay.innerText = "❤️".repeat(lives) + "🖤".repeat(5 - lives);
         }
 
-        document.addEventListener("keydown", (event) => {
+        // Lógica unificada para procesar la letra presionada
+        function handleInput(pressedKey) {
             if (!gameActive) return;
-            if (event.key.length > 1) return;
 
-            const pressedKey = event.key.toUpperCase();
             const targetKey = currentWord[currentIndex];
 
             if (pressedKey === targetKey) {
@@ -223,6 +332,12 @@
                     scoreDisplay.innerText = `Palabras: ${score}`;
                 }
             }
+        }
+
+        // Captura el teclado físico en PC
+        document.addEventListener("keydown", (event) => {
+            if (event.key.length > 1) return;
+            handleInput(event.key.toUpperCase());
         });
     </script>
 </body>
