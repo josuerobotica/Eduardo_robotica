@@ -158,13 +158,11 @@
         const gameContainer = document.getElementById("gameContainer");
 
         function startGame() {
-            // Escoger palabra al azar
             currentWord = wordsList[Math.floor(Math.random() * wordsList.length)];
             currentIndex = 0;
             lives = 5;
             gameActive = true;
 
-            // Resetear interfaz
             messageDisplay.innerHTML = "";
             actionBtn.innerText = "Cambiar Palabra";
             updateLives();
@@ -194,20 +192,15 @@
 
         document.addEventListener("keydown", (event) => {
             if (!gameActive) return;
-
-            // Ignorar teclas especiales como Shift, Control, etc.
             if (event.key.length > 1) return;
 
-            // Convertir a mayúsculas para evitar problemas de capitalización
             const pressedKey = event.key.toUpperCase();
             const targetKey = currentWord[currentIndex];
 
             if (pressedKey === targetKey) {
-                // Acierto
                 currentIndex++;
                 renderWord();
 
-                // ¿Ganó la palabra?
                 if (currentIndex === currentWord.length) {
                     gameActive = false;
                     score++;
@@ -216,15 +209,12 @@
                     actionBtn.innerText = "Siguiente Palabra";
                 }
             } else {
-                // Error
                 lives--;
                 updateLives();
                 
-                // Efecto visual de parpadeo/sacudida
                 gameContainer.classList.add("error-shake");
                 setTimeout(() => gameContainer.classList.remove("error-shake"), 200);
 
-                // ¿Perdió todas las vidas?
                 if (lives === 0) {
                     gameActive = false;
                     messageDisplay.innerHTML = '<span class="danger-text">¡Juego Terminado! 😢 Inténtalo de nuevo.</span>';
